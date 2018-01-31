@@ -15,35 +15,52 @@ import ScrollableTabView, {ScrollableTabBar} from 'react-native-scrollable-tab-v
 import NavigationBar from '../common/NavigationBar'
 import DataRepository from '../expand/dao/DataRepository'
 import RepositoryCell from '../common/RepositoryCell'
+import LanguageDao, {FLAG_LANGUAGE} from '../expand/dao/LanguageDao'
+
 const URL='https://api.github.com/search/repositories?q=';
 const QUERY_STR = '&sort=stars';
 export default class PopularPage extends Component {
     constructor(props) {
         super(props);
-        this.dataRepository=new DataRepository();
+        this.languageDao = new LanguageDao(FLAG_LANGUAGE);
         this.state={
-            results:'',
+            language:[],
         }
     }
-
-    onLoad(){
-        let url = this.getUrl(this.text);
-        this.dataRepository.fetchNetRepository(url)
-            .then(result=>{
-                this.setState({
-                    dataSource:JSON.stringify(result)
-                });
-            })
-            .catch(error=>{
-                console.log(error)
-            })
+    componentDidMount() {
+        this.loadData();
     }
 
-    getUrl(key) {
-        return URL + key + QUERY_STR;
+
+    loadData() {
+        this.languageDao.fetch()
+            .then(result => {
+                this.setState({
+                    language: result
+                })
+            })
+            .catch(error => {
+                console.log(error);
+            })
     }
 
     render() {
+        let content=this.state.language.length>0?<ScrollableTabView
+                tabBarBackgroundColor="#2196F3"
+                tabBarInactiveTextColor="mintcream"
+                tabBarActiveTextColor="white"
+                tabBarUnderlineStyle={{backgroundColor:"#e7e7e7", height:2}}
+                renderTabBar={()=><ScrollableTabBar/>}
+            >
+                {this.state.language.map((result, i, arr)=>{
+                    let lan=arr[i];
+                    return lan.checked? <PopularTab key={i} tabLabel={lan.name}>Java</PopularTab>:null;
+                })}
+                <PopularTab tabLabel="java">Java</PopularTab>
+                <PopularTab tabLabel="ios">IOS</PopularTab>
+                <PopularTab tabLabel="android">Android</PopularTab>
+                <PopularTab tabLabel="javascript">JavaScript</PopularTab>
+            </ScrollableTabView>:null
         return <View style={styles.container}>
             <NavigationBar
                 title={'最热'}
@@ -51,18 +68,7 @@ export default class PopularPage extends Component {
                     backgroundColor:'#2196F3'
                 }}
             />
-            <ScrollableTabView
-                tabBarBackgroundColor="#2196F3"
-                tabBarInactiveTextColor="mintcream"
-                tabBarActiveTextColor="white"
-                tabBarUnderlineStyle={{backgroundColor:"#e7e7e7", height:2}}
-                renderTabBar={()=><ScrollableTabBar/>}
-            >
-                <PopularTab tabLabel="java">Java</PopularTab>
-                <PopularTab tabLabel="ios">IOS</PopularTab>
-                <PopularTab tabLabel="android">Android</PopularTab>
-                <PopularTab tabLabel="javascript">JavaScript</PopularTab>
-            </ScrollableTabView>
+            {content}
         </View>
     }
 }

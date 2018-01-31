@@ -14,13 +14,88 @@ import {
 } from 'react-native'
 import NavigationBar from '../../common/NavigationBar'
 import ViewUtils from '../../util/ViewUtils'
+import LanguageDao, {FLAG_LANGUAGE} from '../../expand/dao/LanguageDao'
+import ChectBox from 'react-native-check-box';
+import ArrayUtils from '../../util/ArrayUtils'
 export default class CustomKeyPage extends Component {
     constructor(props) {
-        super(props)
+        super(props);
+        this.languageDao = new LanguageDao(FLAG_LANGUAGE.flag_key);
+        this.changeValues=[]
+        this.state = {
+            dataArray: []
+        }
+    }
+
+    componentDidMount() {
+        this.loadData();
+    }
+
+    loadData() {
+        this.languageDao.fetch()
+            .then(result => {
+                this.setState({
+                    dataArray: result
+                })
+            })
+            .catch(error => {
+                console.log(error);
+            })
     }
 
     onSave() {
+        if (this.changeValues.length===0) {
+            this.props.navigator.pop();
+            return;
+        }
+        this.languageDao.save(this.state.dataArray);
         this.props.navigator.pop();
+    }
+
+    renderView() {
+        if (!this.state.dataArray || this.state.dataArray.length === 0) return null;
+        let len = this.state.dataArray.length;
+        let views = [];
+        for (let i = 0, l = len - 2; i < l; i += 2) {
+            views.push(
+                <View key={i}>
+                    <View>
+                        {this.renderCheckBox(this.state.dataArray[i])}
+                        {this.renderCheckBox(this.state.dataArray[i + 1])}
+                    </View>
+                    <View style={styles.line}></View>
+                </View>
+            )
+        }
+        views.push(
+            <View key={len-1}>
+                <View>
+                    {len % 2 === 0 ? this.renderCheckBox(this.state.dataArray[len - 2]) : null}
+                    {this.renderCheckBox(this.state.dataArray(len-1))}
+                </View>
+                <View style={styles.line}></View>
+            </View>
+        )
+        return views;
+    }
+
+    onClick(data) {
+        data.checked=!data.checked;
+        ArrayUtils.updateArray(this.changeValues, data);
+    }
+
+    renderCheckBox(data) {
+        let leftText = data.name;
+        return (
+            <ChectBox
+                style={{flex:1,padding:10}}
+                onClick={()=>this.onClick(data)}
+                leftText={leftText}
+                isChecked={data.checked}
+                checkedImage={<Image style={{tintColor:'#6495ED'}} source={require('./img/ic_check_box.png')}/>}
+                unCheckedImage={<Image style={{tintColor:'#6495ED'}} source={require('./img/ic_check_box_outline_blank.png')}/>}
+            />
+        )
     }
 
     render() {
@@ -46,14 +121,23 @@ export default class CustomKeyPage extends Component {
 }
 
 const styles = StyleSheet.create({
-    container:{
-        flex:1,
+    container: {
+        flex: 1,
     },
     tips: {
-        fontSize:29,
+        fontSize: 29,
     },
     title: {
-        fontSize:15,
-        color:'white'
+        fontSize: 15,
+        color: 'white'
+    },
+    line: {
+        height: 0.3,
+        backgroundColor: 'darkgray',
+
+    },
+    item: {
+        flexDirection: 'row',
+        alignItems: 'center',
     }
 })
