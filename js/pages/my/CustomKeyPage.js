@@ -98,6 +98,21 @@ export default class CustomKeyPage extends Component {
         )
     }
 
+    onBack(){
+        if (this.changeValues.length === 0) {
+            this.props.navigator.pop();
+            return;
+        }
+        Alert.alert(
+            '提示',
+            '要保存修改吗？',
+            [
+                {text:'否', onPress:()=>{this.props.navigator.pop();}, style:'cancel'},
+                {text:'是', onPress:()=>{this.onSave();}}
+            ]
+        )
+    }
+
     render() {
         let rightButton = <TouchableOpacity
             onPress={()=>this.onSave()}
@@ -111,7 +126,7 @@ export default class CustomKeyPage extends Component {
                 <NavigationBar
                     title='自定义标签页'
                     style={{backgroundColor:'#6495ED'}}
-                    leftButton={ViewUtils.getLeftButton(()=>this.onSave())}
+                    leftButton={ViewUtils.getLeftButton(()=>this.onBack())}
                     rightButton={rightButton}
                 />
                 <Text style={styles.tips}>自定义标签</Text>

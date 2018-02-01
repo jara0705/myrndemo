@@ -21,4 +21,15 @@ export default class ViewUtils {
                     source={require('../../res/images/ic_arrow_back_white_36pt.png')}/>
         </TouchableOpacity>
     }
+
+    static getRightButton(title, callBack) {
+        return <TouchableOpacity
+            style={{alignItems: 'center',}}
+            onPress={callBack}>
+            <View style={{marginRight: 10}}>
+                <Text style={{fontSize: 20, color: '#FFFFFF',}}>{title}</Text>
+            </View>
+        </TouchableOpacity>
+    }
+
 }
