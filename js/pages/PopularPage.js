@@ -91,14 +91,24 @@ class PopularTab extends Component{
     onLoad(){
         this.setState({
             isLoading:true
-        })
+        });
         let url = URL + this.props.tabLabel + QUERY_STR;
-        this.dataRepository.fetchNetRepository(url)
+        this.dataRepository.fetchRepository(url)
             .then(result=>{
+                let items = result&&result.items? result.items:result?result:[];
                 this.setState({
-                    dataSource:this.state.dataSource.cloneWithRows(result.items),
+                    dataSource:this.state.dataSource.cloneWithRows(items),
                     isLoading:false,
                 });
+                if (result && result.update_date&& !this.dataRepository.checkDate(result.update_date)) {
+                    return this.dataRepository.fetchNetRepository(url);
+                }
+            })
+            .then(items=>{
+                if(!items||items.length === 0)return;
+                this.setState({
+                    dataSource:this.state.dataSource.cloneWithRows(items),
+                })
             })
             .catch(error=>{
                 console.log(error);
