@@ -21,7 +21,8 @@ export default class CustomKeyPage extends Component {
     constructor(props) {
         super(props);
         this.languageDao = new LanguageDao(FLAG_LANGUAGE.flag_key);
-        this.changeValues=[]
+        this.changeValues = [];
+        this.isRemoveKey = this.props.isRemoveKey ? true : false;
         this.state = {
             dataArray: []
         }
@@ -44,9 +45,12 @@ export default class CustomKeyPage extends Component {
     }
 
     onSave() {
-        if (this.changeValues.length===0) {
+        if (this.changeValues.length === 0) {
             this.props.navigator.pop();
             return;
+        }
+        for (let i = 0, l=this.changeValues.length; i < l; i++) {
+            ArrayUtils.remove(this.state.dataArray, this.changeValues[i])
         }
         this.languageDao.save(this.state.dataArray);
         this.props.navigator.pop();
@@ -71,7 +75,7 @@ export default class CustomKeyPage extends Component {
             <View key={len-1}>
                 <View>
                     {len % 2 === 0 ? this.renderCheckBox(this.state.dataArray[len - 2]) : null}
-                    {this.renderCheckBox(this.state.dataArray(len-1))}
+                    {this.renderCheckBox(this.state.dataArray(len - 1))}
                 </View>
                 <View style={styles.line}></View>
             </View>
@@ -80,12 +84,13 @@ export default class CustomKeyPage extends Component {
     }
 
     onClick(data) {
-        data.checked=!data.checked;
+        if (!this.isRemoveKey) data.checked = !data.checked;
         ArrayUtils.updateArray(this.changeValues, data);
     }
 
     renderCheckBox(data) {
         let leftText = data.name;
+        let isChecked = this.isRemoveKey ? false : data.checked;
         return (
             <ChectBox
                 style={{flex:1,padding:10}}
@@ -98,7 +103,7 @@ export default class CustomKeyPage extends Component {
         )
     }
 
-    onBack(){
+    onBack() {
         if (this.changeValues.length === 0) {
             this.props.navigator.pop();
             return;
@@ -107,29 +112,35 @@ export default class CustomKeyPage extends Component {
             '提示',
             '要保存修改吗？',
             [
-                {text:'否', onPress:()=>{this.props.navigator.pop();}, style:'cancel'},
-                {text:'是', onPress:()=>{this.onSave();}}
+                {
+                    text: '否', onPress: () => {
+                    this.props.navigator.pop();
+                }, style: 'cancel'
+                },
+                {
+                    text: '是', onPress: () => {
+                    this.onSave();
+                }
+                }
             ]
         )
     }
 
     render() {
-        let rightButton = <TouchableOpacity
-            onPress={()=>this.onSave()}
-        >
-            <View style={{margin:10}}>
-                <Text style={styles.title}>保存</Text>
-            </View>
-        </TouchableOpacity>
+        let rightButtonTitle = this.isRemoveKey ? '移除' : '保存';
+        let title = this.isRemoveKey ? '标签移除' : '自定义标签';
+        let navigationBar =
+            <NavigationBar
+                title={title}
+                leftButton={ViewUtils.getLeftButton(()=>this.onBack())}
+                style={this.props.theme.styles.navBar}
+                rightButton={ViewUtils.getRightButton(rightButtonTitle,()=>this.onSave())}/>;
         return (
             <View style={styles.container}>
-                <NavigationBar
-                    title='自定义标签页'
-                    style={{backgroundColor:'#6495ED'}}
-                    leftButton={ViewUtils.getLeftButton(()=>this.onBack())}
-                    rightButton={rightButton}
-                />
-                <Text style={styles.tips}>自定义标签</Text>
+                {navigationBar}
+                <ScrollView>
+                    {this.renderView()}
+                </ScrollView>
             </View>
         )
     }
@@ -138,6 +149,7 @@ export default class CustomKeyPage extends Component {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        backgroundColor: '#f3f2f2'
     },
     tips: {
         fontSize: 29,
@@ -147,6 +159,7 @@ const styles = StyleSheet.create({
         color: 'white'
     },
     line: {
+        flex: 1,
         height: 0.3,
         backgroundColor: 'darkgray',
 
