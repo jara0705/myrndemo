@@ -13,7 +13,7 @@ import {
 } from 'react-native'
 import ScrollableTabView, {ScrollableTabBar} from 'react-native-scrollable-tab-view'
 import NavigationBar from '../common/NavigationBar'
-import DataRepository from '../expand/dao/DataRepository'
+import DataRepository, {FLAG_STORAGE} from '../expand/dao/DataRepository'
 import RepositoryCell from '../common/RepositoryCell'
 import LanguageDao, {FLAG_LANGUAGE} from '../expand/dao/LanguageDao'
 import RepositoryDetail from './RepositoryDetail'
@@ -22,7 +22,7 @@ const QUERY_STR = '&sort=stars';
 export default class PopularPage extends Component {
     constructor(props) {
         super(props);
-        this.languageDao = new LanguageDao(FLAG_LANGUAGE);
+        this.languageDao = new LanguageDao(FLAG_LANGUAGE.flag_language);
         this.state={
             language:[],
         }
@@ -72,9 +72,8 @@ export default class PopularPage extends Component {
 class PopularTab extends Component{
     constructor(props) {
         super(props);
-        this.dataRepository=new DataRepository();
+        this.dataRepository=new DataRepository(FLAG_STORAGE.flag_popular);
         this.state={
-            results:'',
             dataSource:new ListView.DataSource({rowHasChanged:(r1,r2)=>r1!==r2}),
             isLoading:false,
         }

@@ -4,23 +4,37 @@
 import {
     AsyncStorage,
 } from 'react-native';
+import GitHubTrending from 'GitHubTrending'
+export var FLAG_STORAGE = {flag_popular: 'popular', flag_trending: 'trending'};
 export default class DataRepository {
+
+    constructor(flag) {
+        this.flag = flag;
+        if (flag === FLAG_STORAGE.flag_trending) this.trending = new GitHubTrending();
+    }
+
     fetchRepository(url) {
-        return new Promise((resolve, reject)=>{
+        return new Promise((resolve, reject) => {
             this.fetchLocalRepository(url)
-                .then(result=>{
-                    if(result) {
-                        resolve(result);
+                .then((wrapData) => {
+                    if (wrapData) {
+                        resolve(wrapData, true);
                     } else {
                         this.fetchNetRepository(url)
-                            .then(result=>{
-                                resolve(result);
+                            .then((data) => {
+                                resolve(data);
                             })
-                            .catch(e=>{
-                                resolve(e);
+                            .catch((error) => {
+                                reject(error);
                             })
                     }
+                }).catch((error) => {
+                this.fetchNetRepository(url).then((data) => {
+                    resolve(data);
+                }).catch((error) => {
+                    reject(error);
                 })
+            })
         })
     }
 
@@ -30,12 +44,12 @@ export default class DataRepository {
      * @returns {Promise}
      */
     fetchLocalRepository(url) {
-        return new Promise((resolve, reject)=>{
-            AsyncStorage.getItem(url, (error, result)=>{
-                if(!error) {
+        return new Promise((resolve, reject) => {
+            AsyncStorage.getItem(url, (error, result) => {
+                if (!error) {
                     try {
                         resolve(JSON.parse(result));
-                    }catch (e) {
+                    } catch (e) {
                         reject(e);
                     }
                 } else {
@@ -46,20 +60,35 @@ export default class DataRepository {
     }
 
     fetchNetRepository(url) {
-        return new Promise((resolve, reject)=>{
-            fetch(url)
-                .then(response=>response.json())
-                .then(result=>{
-                    if (!result) {
-                        reject(new Error('responseData is null'));
-                        return;
-                    }
-                    resolve(result.items);
-                    this.saveRepository(url, result.items);
-                })
-                .catch(error=>{
+        return new Promise((resolve, reject) => {
+            if (this.flag === FLAG_STORAGE.flag_trending) {
+                this.treding.fetchTrending(url)
+                    .then((items) => {
+                        if (!items) {
+                            reject(new Error('responseData is null'));
+                            return;
+                        }
+                        resolve(items);
+                        this.saveRepository(url, items)
+                    }).catch((error) => {
                     reject(error);
                 })
+            } else {
+                fetch(url)
+                    .then((response) => response.json())
+                    .catch(error => {
+                        reject(error);
+                    })
+                    .then((responseData) => {
+                        if (!responseData || !responseData.items) {
+                            reject(new Error('responseData is null'));
+                            return;
+                        }
+                        resolve(responseData.items);
+                        this.saveRepository(url, responseData.items);
+                    }).done();
+            }
+
         })
     }
 
@@ -67,7 +96,7 @@ export default class DataRepository {
         if (!url || !items) {
             return;
         }
-        let wrapData={items: items, update_date: new Date().getTime()};
+        let wrapData = {items: items, update_date: new Date().getTime()};
         AsyncStorage.setItem(url, JSON.stringify(wrapData), callBack)
     }
 
