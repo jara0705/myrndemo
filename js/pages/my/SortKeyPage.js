@@ -14,18 +14,20 @@ import {
 } from 'react-native'
 import ArrayUtils from '../../util/ArrayUtils'
 import SortableListView from 'react-native-sortable-listview'
-import LanguageDao,{FLAG_LANGUAGE} from '../../expand/dao/LanguageDao'
+import LanguageDao, {FLAG_LANGUAGE} from '../../expand/dao/LanguageDao'
 import ViewUtils from '../../util/ViewUtils'
+import NavigationBar from '../../common/NavigationBar'
 export default class SortKeyPage extends Component {
     constructor(props) {
         super(props);
-        this.dataArray=[];
-        this.sortResultArray=[];
-        this.originalCheckedArray=[];
-        this.state={
-            checkedArray:[]
+        this.dataArray = [];
+        this.sortResultArray = [];
+        this.originalCheckedArray = [];
+        this.state = {
+            checkedArray: []
         }
     }
+
     componentDidMount() {
         this.languageDao = new LanguageDao(FLAG_LANGUAGE);
         this.loadData();
@@ -33,10 +35,10 @@ export default class SortKeyPage extends Component {
 
     loadData() {
         this.languageDao.fetch()
-            .then(result=>{
+            .then(result => {
                 this.getCheckedItems(result);
             })
-            .catch(error=>{
+            .catch(error => {
 
             })
     }
@@ -44,15 +46,16 @@ export default class SortKeyPage extends Component {
     getCheckedItems(result) {
         this.dataArray = result;
         let checkedArray = [];
-        for (let i=0, len=result.length; i<len; i++) {
+        for (let i = 0, len = result.length; i < len; i++) {
             let data = result[i];
             if (data.checked) checkedArray.push(data);
         }
         this.setState({
-            checkedArray:checkedArray,
+            checkedArray: checkedArray,
         })
         this.originalCheckedArray = ArrayUtils.clone(checkedArray);
     }
+
     onBack() {
         if (ArrayUtils.isEqual(this.state.checkedArray, this.originalCheckedArray)) {
             this.props.navigator.pop();
@@ -62,11 +65,20 @@ export default class SortKeyPage extends Component {
             '提示',
             '要保存修改吗？',
             [
-                {text:'否', onPress:()=>{this.props.navigator.pop();}, style:'cancel'},
-                {text:'是', onPress:()=>{this.onSave(true);}}
+                {
+                    text: '否', onPress: () => {
+                    this.props.navigator.pop();
+                }, style: 'cancel'
+                },
+                {
+                    text: '是', onPress: () => {
+                    this.onSave(true);
+                }
+                }
             ]
         )
     }
+
     onSave(isChecked) {
         if (!isChecked && ArrayUtils.isEqual(this.state.checkedArray, this.originalCheckedArray)) {
             this.props.navigator.pop();
@@ -76,9 +88,10 @@ export default class SortKeyPage extends Component {
         this.languageDao.save(this.sortResultArray);
         this.props.navigator.pop();
     }
+
     getSortResult() {
         this.sortResultArray = ArrayUtils.clone(this.dataArray);
-        for (let i=0, len=this.originalCheckedArray.length; i<len; i++) {
+        for (let i = 0, len = this.originalCheckedArray.length; i < len; i++) {
             let item = this.originalCheckedArray[i];
             let index = this.dataArray.indexOf(item);
             this.sortResultArray.splice(index, 1, this.state.checkedArray);
@@ -89,9 +102,9 @@ export default class SortKeyPage extends Component {
         return (
             <View style={styles.container}>
                 <NavigationBar
-                    title={title}
+                    title={"标签排序"}
                     leftButton={ViewUtils.getLeftButton(()=>this.onBack())}
-                    style={this.props.theme.styles.navBar}
+                    style={{backgroundColor: '#6495ED'}}
                     rightButton={ViewUtils.getRightButton('保存',()=>this.onSave(true))}/>
                 <SortableListView
                     style={{flex:1}}
@@ -119,7 +132,7 @@ class SortCell extends Component {
                     width: 16,
                     height: 16,
                     marginRight: 10,
-                },this.props.theme.styles.tabBarSelectedIcon]}/>
+                }]}/>
                 <Text>{this.props.data.name}</Text>
             </View>
         </TouchableHighlight>
@@ -135,7 +148,7 @@ const styles = StyleSheet.create({
         height: 0
     },
     item: {
-        backgroundColor: "#F8F8F8",
+        backgroundColor: '#F8F8F8',
         borderBottomWidth: 1,
         borderColor: '#eee',
         height: 50,

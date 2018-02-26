@@ -14,6 +14,7 @@ import {
 } from 'react-native'
 import NavigationBar from '../common/NavigationBar'
 import ViewUtils from '../util/ViewUtils'
+const URL = 'http://www.imooc.com';
 export default class RepositoryDetail extends Component {
 
     constructor(props) {
@@ -48,7 +49,7 @@ export default class RepositoryDetail extends Component {
                 <NavigationBar
                     leftButton={ViewUtils.getLeftButton(()=>this.onBack())}
                     title={this.state.title}
-                    style={this.props.theme.styles.navBar}
+                    style={{backgroundColor: '#6495ED'}}
                 />
                 <WebView
                     ref={webView=>this.webView = webView}

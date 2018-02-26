@@ -18,6 +18,8 @@ import SortKeyPage from './SortKeyPage'
 export default class MyPage extends Component {
     constructor(props) {
         super(props);
+        this.state={
+        }
     }
 
     render() {
@@ -48,8 +50,8 @@ export default class MyPage extends Component {
                         this.props.navigator.push({
                             component:CustomKeyPage,
                             params:{
-                                ...this.props
-                                , isRemoveKey: true
+                                ...this.props,
+                                isRemoveKey: true
                             }
                         })
                     }}

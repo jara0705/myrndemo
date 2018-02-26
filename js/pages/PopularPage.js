@@ -40,7 +40,6 @@ export default class PopularPage extends Component {
                 })
             })
             .catch(error => {
-                console.log(error);
             })
     }
 
@@ -54,14 +53,10 @@ export default class PopularPage extends Component {
                                                       tabStyle={{height: 39}}/>}
             >
                 {this.state.language.map((result, i, arr)=>{
-                    let lan=arr[i];
-                    return lan.checked? <PopularTab key={i} tabLabel={lan.name} {...this.props}>Java</PopularTab>:null;
+                    let language=arr[i];
+                    return language.checked? <PopularTab key={i} tabLabel={language.name} {...this.props}/>:null;
                 })}
-                <PopularTab tabLabel="java">Java</PopularTab>
-                <PopularTab tabLabel="ios">IOS</PopularTab>
-                <PopularTab tabLabel="android">Android</PopularTab>
-                <PopularTab tabLabel="javascript">JavaScript</PopularTab>
-            </ScrollableTabView>:null
+            </ScrollableTabView>:null;
         return <View style={styles.container}>
             <NavigationBar
                 title={'最热'}
@@ -112,7 +107,7 @@ class PopularTab extends Component{
                 })
             })
             .catch(error=>{
-                console.log(error);
+                // console.log(error);
             })
     }
 
@@ -121,7 +116,7 @@ class PopularTab extends Component{
             component: RepositoryDetail,
             params:{
                 item:item,
-                ...this.props,
+                ...this.props
             }
         })
     }

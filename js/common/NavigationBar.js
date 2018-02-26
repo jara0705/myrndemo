@@ -32,7 +32,7 @@ export default class NavigationBar extends Component {
     static defaultProps = {
         statusBar: {
             barStyle: 'light-content',
-            hidder: false,
+            hidden: false,
         }
     }
 

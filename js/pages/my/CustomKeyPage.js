@@ -15,12 +15,11 @@ import {
 import NavigationBar from '../../common/NavigationBar'
 import ViewUtils from '../../util/ViewUtils'
 import LanguageDao, {FLAG_LANGUAGE} from '../../expand/dao/LanguageDao'
-import ChectBox from 'react-native-check-box';
+import CheckBox from 'react-native-check-box';
 import ArrayUtils from '../../util/ArrayUtils'
 export default class CustomKeyPage extends Component {
     constructor(props) {
         super(props);
-        this.languageDao = new LanguageDao(FLAG_LANGUAGE.flag_key);
         this.changeValues = [];
         this.isRemoveKey = this.props.isRemoveKey ? true : false;
         this.state = {
@@ -29,18 +28,19 @@ export default class CustomKeyPage extends Component {
     }
 
     componentDidMount() {
+        this.languageDao = new LanguageDao(FLAG_LANGUAGE.flag_key);
         this.loadData();
     }
 
     loadData() {
         this.languageDao.fetch()
-            .then(result => {
+            .then((data) => {
                 this.setState({
-                    dataArray: result
+                    dataArray: data
                 })
             })
             .catch(error => {
-                console.log(error);
+
             })
     }
 
@@ -63,21 +63,21 @@ export default class CustomKeyPage extends Component {
         for (let i = 0, l = len - 2; i < l; i += 2) {
             views.push(
                 <View key={i}>
-                    <View>
+                    <View style={styles.item}>
                         {this.renderCheckBox(this.state.dataArray[i])}
                         {this.renderCheckBox(this.state.dataArray[i + 1])}
                     </View>
-                    <View style={styles.line}></View>
+                    <View style={styles.line}/>
                 </View>
             )
         }
         views.push(
             <View key={len-1}>
-                <View>
+                <View style={styles.item}>
                     {len % 2 === 0 ? this.renderCheckBox(this.state.dataArray[len - 2]) : null}
                     {this.renderCheckBox(this.state.dataArray(len - 1))}
                 </View>
-                <View style={styles.line}></View>
+                <View style={styles.line}/>
             </View>
         )
         return views;
@@ -92,7 +92,7 @@ export default class CustomKeyPage extends Component {
         let leftText = data.name;
         let isChecked = this.isRemoveKey ? false : data.checked;
         return (
-            <ChectBox
+            <CheckBox
                 style={{flex:1,padding:10}}
                 onClick={()=>this.onClick(data)}
                 leftText={leftText}
@@ -133,7 +133,7 @@ export default class CustomKeyPage extends Component {
             <NavigationBar
                 title={title}
                 leftButton={ViewUtils.getLeftButton(()=>this.onBack())}
-                style={this.props.theme.styles.navBar}
+                style={{backgroundColor:'#2196f3'}}
                 rightButton={ViewUtils.getRightButton(rightButtonTitle,()=>this.onSave())}/>;
         return (
             <View style={styles.container}>

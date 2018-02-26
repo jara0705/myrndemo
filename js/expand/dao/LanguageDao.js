@@ -6,7 +6,8 @@ import {
     AsyncStorage,
 } from 'react-native'
 import keysData from '../../../res/data/keys.json'
-export var FLAG_LANGUAGE = {flag_language:'flag_language_language', flag_key:"flag_Language_key"}
+import langsData from '../../../res/data/langs.json'
+export var FLAG_LANGUAGE = {flag_language: 'language_dao_language', flag_key: 'language_dao_key'}
 export default class LanguageDao {
     constructor(flag) {
         this.flag = flag;
@@ -14,19 +15,19 @@ export default class LanguageDao {
     fetch() {
         return new Promise((resolve, reject) => {
             AsyncStorage.getItem(this.flag,(error,result)=>{
-                if(error) {
+                if(error){
                     reject(error);
-                } else {
-                    if (result) {
-                        try {
-                            resolve(JSON.parse(result));
-                        } catch (e) {
-                            reject(e);
-                        }
-                    } else {
-                        var data = this.flag == FLAG_LANGUAGE.flag_key? keysData:null;
-                        this.save(data);
-                        resolve(data);
+                    return;
+                }
+                if (!result){
+                    var data=this.flag===FLAG_LANGUAGE.flag_language? langsData:keysData;
+                    this.save(data);
+                    resolve(data);
+                }else {
+                    try {
+                        resolve(JSON.parse(result));
+                    } catch (e) {
+                        reject(error);
                     }
                 }
             })
@@ -34,7 +35,7 @@ export default class LanguageDao {
     }
 
     save(data){
-        AsyncStorage.setItem(this.flag, JSON.stringify(data),(error)=>{
+        AsyncStorage.setItem(this.flag, JSON.stringify(data),(error, result)=>{
 
         })
     }

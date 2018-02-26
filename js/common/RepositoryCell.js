@@ -18,23 +18,24 @@ export default class RepositoryCell extends Component {
     }
 
     render() {
+        let data = this.props.data;
         return <TouchableOpacity
             onPress={this.props.onSelect}
             style={styles.container}>
             <View style={styles.cell_container}>
-                <Text style={styles.title}>{this.props.data.full_name}</Text>
-                <Text style={styles.description}>{this.props.data.description}</Text>
+                <Text style={styles.title}>{data.full_name}</Text>
+                <Text style={styles.description}>{data.description}</Text>
                 <View style={{flexDirection:'row', justifyContent:'space-between'}}>
                     <View style={{flexDirection:'row', alignItems:'center'}}>
                         <Text>Author:</Text>
                         <Image
                             style={{height:22,width:22}}
-                            source={{uri:this.props.data.owner.avatar_url}}
+                            source={{uri:data.owner.avatar_url}}
                         />
                     </View>
                     <View style={{flexDirection:'row', alignItems:'center'}}>
                         <Text>Stars:</Text>
-                        <Text>{this.props.data.stargazers_count}</Text>
+                        <Text>{data.stargazers_count}</Text>
                     </View>
                     <Image
                         style={{height:22,width:22}}
