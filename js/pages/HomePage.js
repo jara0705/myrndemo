@@ -20,6 +20,18 @@ export default class HomePage extends Component {
         }
     }
 
+    _renderTab(Component, selectTab, title, renderIcon) {
+        return <TabNavigator.Item
+            selected={this.state.selectedTab === selectTab}
+            selectedTitleStyle={{color:'#2196F3'}}
+            title={title}
+            renderIcon={() => <Image style={styles.image}  source={renderIcon} />}
+            renderSelectedIcon={() => <Image style={[styles.image, {tintColor:'#2196F3'}]} source={renderIcon} />}
+            onPress={() => this.setState({ selectedTab: selectTab })}>
+            <Component {...this.props}/>
+        </TabNavigator.Item>
+    }
+
     render() {
         return (
             <View style={styles.container}>
